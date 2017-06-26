@@ -11,11 +11,9 @@ const entities = {
       updated_at: new Date()
     })
     .then((value) => {
-      console.log(value)
       callback(null)
     })
     .catch((error) => {
-      console.log(error)
       callback(error)
     })
   },
@@ -24,11 +22,9 @@ const entities = {
     knex('entities')
     .select('*')
     .then((data) => {
-      console.log(data)
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   },
@@ -38,11 +34,9 @@ const entities = {
     .select('*')
     .where({id})
     .then((data) => {
-      console.log(data)
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   }

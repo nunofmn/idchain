@@ -1,6 +1,12 @@
 const path = require('path')
 const Glue = require('glue')
+const bunyan = require('bunyan')
 const idchain = require('./utils/idchain')
+
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
 
 const manifest = {
   connections: [
@@ -64,12 +70,12 @@ const options = {
 
 Glue.compose(manifest, options, (err, server) => {
   if (err) {
-    return console.error('Error composing API server.')
+    return log.error({ err }, 'Error composing API server.')
   }
 
   server.start(function (err) {
     if (err) {
-      return console.error('Error starting API server.')
+      return log.error({ err }, 'Error starting API server.')
     }
 
     idchain.initContract(() => {
@@ -79,22 +85,21 @@ Glue.compose(manifest, options, (err, server) => {
 
           idchain.initEntity(account, entity, (err) => {
             if (err) {
-              return console.log('Entity already initialized')
+              return log.warn({ err }, 'Entity already initialized')
             }
 
-            console.log('Account ', account, ' initialized')
+            log.info('Account ', account, ' initialized')
           })
         })
       })
 
       idchain.setupEvents((err, value) => {
         if (err) {
-          return console.error('Error initiating idchain events.')
+          return log.error({ err }, 'Error initiating idchain events.')
         }
-        console.log(value)
       })
     })
   })
 
-  console.log('Server running.')
+  log.info('Server running.')
 })

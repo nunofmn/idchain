@@ -17,7 +17,6 @@ const certificates = {
       callback(null)
     })
     .catch((error) => {
-      console.log(error)
       callback(error)
     })
   },
@@ -30,7 +29,6 @@ const certificates = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   },
@@ -47,7 +45,6 @@ const certificates = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   },
@@ -60,7 +57,6 @@ const certificates = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   }

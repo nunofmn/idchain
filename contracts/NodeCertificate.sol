@@ -2,7 +2,7 @@ contract NodeCertificate {
 
     struct Certificate {
         string ipAddress;
-        string publicKey;
+        string fingerprint;
         uint date;
         uint id;
         bool valid;
@@ -70,23 +70,23 @@ contract NodeCertificate {
         EntityInit(msg.sender, block.timestamp, name);
     }
 
-    function newCertificate(string publicKey, string ipAddress, string peerID) returns (uint) {
-        certificates[peerID].publicKey = publicKey;
+    function newCertificate(string fingerprint, string ipAddress, string peerID) returns (uint) {
+        certificates[peerID].fingerprint = fingerprint;
         certificates[peerID].date = block.timestamp;
         certificates[peerID].id = counterId;
         certificates[peerID].valid = true;
         certificates[peerID].ipAddress = ipAddress;
         certificates[peerID].signer = msg.sender;
 
-        CreateCertificate(msg.sender, counterId, block.timestamp, ipAddress, peerID, publicKey, true);
+        CreateCertificate(msg.sender, counterId, block.timestamp, ipAddress, peerID, fingerprint, true);
 
         counterId++;
 
         return certificates[peerID].id;
     }
 
-    function getCertificate(string peerID) returns (string publicKey, string ipAddress, uint date, uint id, bool valid, address signer) {
-        publicKey = certificates[peerID].publicKey;
+    function getCertificate(string peerID) returns (string fingerprint, string ipAddress, uint date, uint id, bool valid, address signer) {
+        fingerprint = certificates[peerID].fingerprint;
         ipAddress = certificates[peerID].ipAddress;
         date = certificates[peerID].date;
         id = certificates[peerID].id;
@@ -107,7 +107,7 @@ contract NodeCertificate {
     function updateCertificate(string peerID, string publickey, string ipAddress) {
         if(certificates[peerID].signer == msg.sender) {
             certificates[peerID].ipAddress = ipAddress;
-            certificates[peerID].publicKey = publickey;
+            certificates[peerID].fingerprint = publickey;
             certificates[peerID].valid = true;
             certificates[peerID].id = counterId;
             certificates[peerID].date = block.timestamp;

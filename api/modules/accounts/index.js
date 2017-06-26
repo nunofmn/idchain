@@ -1,5 +1,11 @@
 const idchain = require('../../utils/idchain')
+const bunyan = require('bunyan')
 const Joi = require('joi')
+
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
 
 exports.register = function (server, options, next) {
   server.route({
@@ -8,16 +14,16 @@ exports.register = function (server, options, next) {
     handler: function (request, reply) {
       idchain.loadAccount(request.payload.account, (err, value) => {
         if (err) {
-          console.log(err)
+          return log.error({ err })
         }
 
-        console.log('Account configured: ' + value)
+        log.info(`Account configured: ${value}`)
 
         let entity = 'entity' + Math.floor((Math.random() * 1000))
 
         idchain.initEntity(entity, (err) => {
           if (err) {
-            console.log(err)
+            return log.error({ err })
           }
         })
       })
@@ -49,7 +55,7 @@ exports.register = function (server, options, next) {
     handler: function (request, reply) {
       idchain.signCertificate(request.params.id, (err, value) => {
         if (err) {
-          console.log(err)
+          log.error({ err })
           return reply(new Error(err))
         }
 

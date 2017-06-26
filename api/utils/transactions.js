@@ -27,7 +27,6 @@ const transactions = {
       callback(null)
     })
     .catch((error) => {
-      console.log(error)
       callback(error)
     })
   },
@@ -40,7 +39,6 @@ const transactions = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   },
@@ -55,7 +53,6 @@ const transactions = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   }

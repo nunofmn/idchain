@@ -1,5 +1,11 @@
 const idchain = require('../../utils/idchain')
+const bunyan = require('bunyan')
 const Joi = require('joi')
+
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
 
 const certificates = require('../../utils/certificates')
 
@@ -43,13 +49,14 @@ exports.register = function (server, options, next) {
     method: 'POST',
     path: '/certificate',
     handler: function (request, reply) {
-      let publicKey = request.payload.publicKey
+      let fingerprint = request.payload.fingerprint
       let ipAddress = request.payload.ipAddress
       let peerID = request.payload.peerID
       let entity = request.headers['eth-account']
 
-      idchain.createCertificate(entity, publicKey, ipAddress, peerID, (err, value) => {
+      idchain.createCertificate(entity, fingerprint, ipAddress, peerID, (err, value) => {
         if (err) {
+          log.error({ err })
           return reply(new Error(err))
         }
 
@@ -59,7 +66,7 @@ exports.register = function (server, options, next) {
     config: {
       validate: {
         payload: {
-          publicKey: Joi.string().min(40),
+          fingerprint: Joi.string().min(40),
           ipAddress: Joi.string(),
           peerID: Joi.string()
         },

@@ -14,13 +14,11 @@ const signatures = {
       callback(null)
     })
     .catch((error) => {
-      console.log(error)
       callback(error)
     })
   },
 
   removeSigner (target, signer, callback) {
-    console.log('REMOVING SIGNER', target, ' ', signer)
     knex('signers')
     .del()
     .where({
@@ -31,7 +29,6 @@ const signatures = {
       callback(null)
     })
     .catch((error) => {
-      console.log(error)
       callback(error)
     })
   },
@@ -44,7 +41,6 @@ const signatures = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   },
@@ -57,7 +53,6 @@ const signatures = {
       callback(null, data)
     })
     .catch((error) => {
-      console.log(error)
       callback(error, null)
     })
   }
