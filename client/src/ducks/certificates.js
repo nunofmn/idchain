@@ -1,6 +1,7 @@
 /* global fetch: false, Headers */
 
 const API_ENDPOINT = process.env.REACT_APP_API_URL
+console.log('ENDPOINT: ', API_ENDPOINT)
 
 const FETCH_CERTIFICATES_ENTITY = 'idchain/certificates/FETCH_CERTIFICATES_ENTITY'
 const FETCH_CERTIFICATES_ENTITY_SUCCESS = 'idchain/certificates/FETCH_CERTIFICATES_ENTITY_SUCCESS'
