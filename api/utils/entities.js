@@ -1,44 +1,56 @@
-const knex = require('../../db.js')
+const bunyan = require('bunyan')
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
+
+const Entity = require('../models').Entity
 
 const entities = {
 
   saveEntity (data, callback) {
-    knex('entities')
-    .insert({
-      id: data.args.entity,
-      name: data.args.name,
-      created_at: new Date(),
-      updated_at: new Date()
-    })
-    .then((value) => {
-      callback(null)
-    })
-    .catch((error) => {
-      callback(error)
-    })
+    Entity
+      .findOrCreate({
+        where: {
+          id: data.args.entity
+        },
+        defaults: {
+          id: data.args.entity,
+          name: data.args.name
+        }
+      })
+      .spread((entity, isCreated) => {
+        if (isCreated) {
+          log.info('Entity already created.')
+        }
+
+        callback(null)
+      })
+      .catch((error) => {
+        callback(error)
+      })
   },
 
   getEntities (callback) {
-    knex('entities')
-    .select('*')
-    .then((data) => {
-      callback(null, data)
-    })
-    .catch((error) => {
-      callback(error, null)
-    })
+    Entity
+      .findAll()
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
   },
 
   getEntityById (id, callback) {
-    knex('entities')
-    .select('*')
-    .where({id})
-    .then((data) => {
-      callback(null, data)
-    })
-    .catch((error) => {
-      callback(error, null)
-    })
+    Entity
+      .findById(id)
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
   }
 }
 
