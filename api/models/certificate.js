@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     publicKey: DataTypes.STRING,
     peerID: DataTypes.STRING,
     blockstamp: DataTypes.STRING,
+    entity: DataTypes.STRING,
     valid: DataTypes.BOOLEAN
   }, {
     underscored: true,

@@ -11,7 +11,7 @@ const certificates = {
         peerID: data.args.peer,
         blockstamp: data.args.timestamp.c[0],
         valid: data.args.valid,
-        entity_id: data.args.entity
+        entity: data.args.entity
       })
       .then((value) => {
         callback(null)
@@ -36,7 +36,7 @@ const certificates = {
     Certificate
       .findAll({
         where: {
-          entity_id: entity
+          entity: entity
         }
       })
       .then((data) => {

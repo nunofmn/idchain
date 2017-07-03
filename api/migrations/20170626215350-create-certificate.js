@@ -19,6 +19,13 @@ module.exports = {
       blockstamp: {
         type: Sequelize.STRING
       },
+      entity: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'Entities',
+          key: 'id'
+        }
+      },
       valid: {
         type: Sequelize.BOOLEAN
       },

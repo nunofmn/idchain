@@ -140,7 +140,7 @@ const idchain = {
     NodeCertificate.deployed()
       .then((instance) => {
         nodecert = instance
-        return nodecert.newCertificate(fingerprint, ipAddress, peerID, { from: account })
+        return nodecert.newCertificate(fingerprint, ipAddress, peerID, { from: account, gas: 2000000 })
       })
       .then((value) => {
         callback(null, value)
