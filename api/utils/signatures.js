@@ -1,60 +1,71 @@
-const knex = require('../../db.js')
+const bunyan = require('bunyan')
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
+
+const Signature = require('../models').Signature
 
 const signatures = {
 
-  addSigner (target, signer, callback) {
-    knex('signers')
-    .insert({
-      target,
-      signer,
-      created_at: new Date(),
-      updated_at: new Date()
-    })
-    .then((data) => {
-      callback(null)
-    })
-    .catch((error) => {
-      callback(error)
-    })
+  addSigner (target, source, callback) {
+    Signature
+      .create({
+        target,
+        source
+      })
+      .then((data) => {
+        callback(null)
+      })
+      .catch((error) => {
+        callback(error)
+      })
   },
 
   removeSigner (target, signer, callback) {
-    knex('signers')
-    .del()
-    .where({
-      target,
-      signer
-    })
-    .then((data) => {
-      callback(null)
-    })
-    .catch((error) => {
-      callback(error)
-    })
+    Signature
+      .destroy({
+        where: {
+          target,
+          signer
+        }
+      })
+      .then(() => {
+        callback(null)
+      })
+      .catch((error) => {
+        callback(error)
+      })
   },
 
   getSignedBy (target, callback) {
-    knex('signers')
-    .select('*')
-    .where({ target })
-    .then((data) => {
-      callback(null, data)
-    })
-    .catch((error) => {
-      callback(error, null)
-    })
+    Signature
+      .findAll({
+        where: {
+          target
+        }
+      })
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
   },
 
-  getSignatures (signer, callback) {
-    knex('signers')
-    .select('*')
-    .where({ signer })
-    .then((data) => {
-      callback(null, data)
-    })
-    .catch((error) => {
-      callback(error, null)
-    })
+  getSignatures (source, callback) {
+    Signature
+      .findAll({
+        where: {
+          source
+        }
+      })
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
   }
 
 }
