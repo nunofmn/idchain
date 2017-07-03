@@ -56,6 +56,21 @@ const certificates = {
       .catch((error) => {
         callback(error, null)
       })
+  },
+
+  getCertificatesByPeerId (peerId, callback) {
+    Certificate
+      .findAll({
+        where: {
+          peerID: peerId
+        }
+      })
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
   }
 }
 

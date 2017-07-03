@@ -60,6 +60,14 @@ const manifest = {
           select: ['api']
         }
       }
+    },
+    {
+      plugin: {
+        register: './peers',
+        options: {
+          select: ['api']
+        }
+      }
     }
   ]
 }
