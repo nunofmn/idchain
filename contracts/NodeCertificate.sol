@@ -1,7 +1,10 @@
+pragma solidity ^0.4.11;
+
 contract NodeCertificate {
 
     struct Certificate {
         string ipAddress;
+        string peerId;
         string fingerprint;
         uint date;
         uint id;
@@ -13,23 +16,37 @@ contract NodeCertificate {
         string name;
         address[] signers;
         address[] signed;
+        Certificate[] certificates;
         bool created;
+        bool valid;
+        bool bootstraper;
     }
 
     uint counterId;
     uint[] revocations;
+    uint bootstrapersCount;
     mapping (string => Certificate) certificates;
     mapping (address => Entity) entities;
 
-    event SignCertificate(
+    event SignEntity(
         address indexed entity,
         address indexed target,
         uint indexed timestamp
     );
 
-    event UnsignCertificate(
+    event UnsignEntity(
         address indexed entity,
         address indexed target,
+        uint indexed timestamp
+    );
+
+    event InvalidateEntity(
+        address indexed entity,
+        uint indexed timestamp
+    );
+
+    event ValidateEntity(
+        address indexed entity,
         uint indexed timestamp
     );
 
@@ -52,22 +69,49 @@ contract NodeCertificate {
     event EntityInit(
         address indexed entity,
         uint indexed timestamp,
-        string name
+        string name,
+        bool valid
     );
 
     function NodeCertificate() {
         counterId = 0;
+        bootstrapersCount = 0;
     }
 
     function initEntity(string name) {
         if(!entities[msg.sender].created) {
             entities[msg.sender].name = name;
             entities[msg.sender].created = true;
+
+            if(bootstrapersCount < 3) {
+              entities[msg.sender].bootstraper = true;
+              entities[msg.sender].valid = true;
+              bootstrapersCount++;
+            } else {
+              entities[msg.sender].bootstraper = false;
+              entities[msg.sender].valid = false;
+            }
         } else{
             throw;
         }
 
-        EntityInit(msg.sender, block.timestamp, name);
+        EntityInit(msg.sender, block.timestamp, name, false);
+    }
+
+    function getEntityStatus(address entity) returns (bool) {
+      if(entities[entity].created) {
+        return entities[entity].valid;
+      } else{
+        throw;
+      }
+    }
+
+    function isEntityBootstraper(address entity) returns (bool) {
+      if(entities[entity].created) {
+        return entities[entity].bootstraper;
+      } else{
+        throw;
+      }
     }
 
     function newCertificate(string fingerprint, string ipAddress, string peerID) returns (uint) {
@@ -76,7 +120,10 @@ contract NodeCertificate {
         certificates[peerID].id = counterId;
         certificates[peerID].valid = true;
         certificates[peerID].ipAddress = ipAddress;
+        certificates[peerID].peerId = peerID;
         certificates[peerID].signer = msg.sender;
+
+        entities[msg.sender].certificates.push(certificates[peerID]);
 
         CreateCertificate(msg.sender, counterId, block.timestamp, ipAddress, peerID, fingerprint, true);
 
@@ -104,10 +151,10 @@ contract NodeCertificate {
         }
     }
 
-    function updateCertificate(string peerID, string publickey, string ipAddress) {
+    function updateCertificate(string peerID, string fingerprint, string ipAddress) {
         if(certificates[peerID].signer == msg.sender) {
             certificates[peerID].ipAddress = ipAddress;
-            certificates[peerID].fingerprint = publickey;
+            certificates[peerID].fingerprint = fingerprint;
             certificates[peerID].valid = true;
             certificates[peerID].id = counterId;
             certificates[peerID].date = block.timestamp;
@@ -115,17 +162,16 @@ contract NodeCertificate {
         }
     }
 
-    function signCertificate(address entity) {
+    function signEntity(address entity) {
         entities[entity].signers.push(msg.sender);
         entities[msg.sender].signed.push(entity);
 
-        SignCertificate(msg.sender, entity, block.timestamp);
+        SignEntity(msg.sender, entity, block.timestamp);
+
+        checkValidity(entity);
     }
 
-    function unsignCertificate(address entity) {
-        // Best place?
-        UnsignCertificate(msg.sender, entity, block.timestamp);
-
+    function unsignEntity(address entity) {
         for(uint i=0; i < entities[entity].signers.length; i++) {
             if(entities[entity].signers[i] == msg.sender) {
                 delete entities[entity].signers[i];
@@ -140,6 +186,31 @@ contract NodeCertificate {
             }
         }
 
+        UnsignEntity(msg.sender, entity, block.timestamp);
+
+        checkValidity(entity);
+    }
+
+    function checkValidity(address entity) {
+      if(entities[entity].signers.length < 3 && !entities[entity].bootstraper) {
+        entities[entity].valid = false;
+
+        for(uint i=0; i < entities[entity].signed.length; i++) {
+          checkValidity(entities[entity].signed[i]);
+        }
+
+        InvalidateEntity(entity, block.timestamp);
+      } else if(entities[entity].signers.length >= 3 && !entities[entity].valid){
+        entities[entity].valid = true;
+
+        for(uint j=0; j < entities[entity].signed.length; j++) {
+          checkValidity(entities[entity].signed[j]);
+        }
+
+        ValidateEntity(entity, block.timestamp);
+      }
+
+      return;
     }
 
     function getSigners(address entity) returns (address[]){
