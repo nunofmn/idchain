@@ -16,7 +16,9 @@ const entities = {
         },
         defaults: {
           id: data.args.entity,
-          name: data.args.name
+          name: data.args.name,
+          valid: data.args.valid,
+          bootstraper: data.args.bootstraper
         }
       })
       .spread((entity, isCreated) => {
@@ -45,6 +47,17 @@ const entities = {
   getEntityById (id, callback) {
     Entity
       .findById(id)
+      .then((data) => {
+        callback(null, data)
+      })
+      .catch((error) => {
+        callback(error, null)
+      })
+  },
+
+  updateEntity (id, fields, callback) {
+    Entity
+      .update(fields, { where: { id } })
       .then((data) => {
         callback(null, data)
       })

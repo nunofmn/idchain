@@ -10,7 +10,7 @@ module.exports = {
       ipAddress: {
         type: Sequelize.STRING
       },
-      publicKey: {
+      fingerprint: {
         type: Sequelize.STRING
       },
       peerID: {
@@ -26,7 +26,7 @@ module.exports = {
           key: 'id'
         }
       },
-      valid: {
+      revoked: {
         type: Sequelize.BOOLEAN
       },
       created_at: {

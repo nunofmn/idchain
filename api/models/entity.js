@@ -4,7 +4,9 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.STRING
     },
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    bootstraper: DataTypes.BOOLEAN,
+    valid: DataTypes.BOOLEAN
   }, {
     underscored: true,
     classMethods: {

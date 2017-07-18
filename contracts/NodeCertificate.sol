@@ -42,21 +42,10 @@ contract NodeCertificate {
     uint indexed timestamp
   );
 
-  event InvalidateEntity(
+  event EntityStatusChange(
     address indexed entity,
     uint indexed timestamp,
-    uint signers
-  );
-
-  event ValidateEntity(
-    address indexed entity,
-    uint indexed timestamp,
-    uint signers
-  );
-
-  event ValidityStatus(
-    address indexed entity,
-    uint indexed signers
+    bool valid
   );
 
   event CreateCertificate(
@@ -79,6 +68,7 @@ contract NodeCertificate {
     address indexed entity,
     uint indexed timestamp,
     string name,
+    bool bootstraper,
     bool valid
   );
 
@@ -96,15 +86,16 @@ contract NodeCertificate {
         entities[msg.sender].bootstraper = true;
         entities[msg.sender].valid = true;
         bootstrapersCount++;
+        EntityInit(msg.sender, block.timestamp, name, true, true);
       } else {
         entities[msg.sender].bootstraper = false;
         entities[msg.sender].valid = false;
+        EntityInit(msg.sender, block.timestamp, name, false, false);
       }
     } else{
       throw;
     }
 
-    EntityInit(msg.sender, block.timestamp, name, false);
   }
 
   function getEntityStatus(address entity) returns (bool) {
@@ -212,7 +203,7 @@ contract NodeCertificate {
         checkValidity(false, entities[entity].signed[i]);
       }
 
-      InvalidateEntity(entity, block.timestamp, entities[entity].signers.length);
+      EntityStatusChange(entity, block.timestamp, false);
     } else if(entities[entity].signers.length >= 2 && previousEntityState && !entities[entity].valid){
       entities[entity].valid = true;
 
@@ -220,7 +211,7 @@ contract NodeCertificate {
         checkValidity(true, entities[entity].signed[j]);
       }
 
-      ValidateEntity(entity, block.timestamp, entities[entity].signers.length);
+      EntityStatusChange(entity, block.timestamp, true);
     }
 
     return;

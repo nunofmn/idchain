@@ -10,6 +10,12 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      valid: {
+        type: Sequelize.BOOLEAN
+      },
+      bootstraper: {
+        type: Sequelize.BOOLEAN
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE

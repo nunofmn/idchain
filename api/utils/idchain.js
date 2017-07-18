@@ -34,7 +34,7 @@ const idchain = {
     NodeCertificate.deployed()
       .then((instance) => {
         nodecert = instance
-        nodecert.SignCertificate().watch((err, result) => {
+        nodecert.SignEntity().watch((err, result) => {
           if (err) { return log.error('Sign Certificate event error.', err) }
 
           transactions.putTransaction(result.transactionHash, result, (err) => {
@@ -46,7 +46,7 @@ const idchain = {
           })
         })
 
-        nodecert.UnsignCertificate().watch((err, result) => {
+        nodecert.UnsignEntity().watch((err, result) => {
           if (err) { return log.error('Unsign Certificate event error.', err) }
 
           transactions.putTransaction(result.transactionHash, result, (err) => {
@@ -90,6 +90,18 @@ const idchain = {
           })
         })
 
+        nodecert.EntityStatusChange().watch((err, result) => {
+          if (err) { return log.error('Entity Status change event error.', err) }
+
+          entities.updateEntity(result.args.entity, { valid: result.args.valid }, (err) => {
+            if (err) { return log.error('Error updating entity in database.', err) }
+
+            transactions.putTransaction(result.transactionHash, result, (err) => {
+              if (err) { return log.error('Error saving transaction to database.', err) }
+            })
+          })
+        })
+
         callback()
       })
       .catch((error) => {
@@ -105,7 +117,7 @@ const idchain = {
     NodeCertificate.deployed()
       .then((instance) => {
         nodecert = instance
-        return nodecert.initEntity(name, { from: account })
+        return nodecert.initEntity(name, { from: account, gas: 2000000 })
       })
       .then((value) => {
         callback(null)

@@ -1,4 +1,5 @@
 const Certificate = require('../models').Certificate
+const entities = require('./entities')
 
 const certificates = {
 
@@ -7,10 +8,10 @@ const certificates = {
       .create({
         id: parseInt(data.args.id),
         ipAddress: data.args.ip,
-        publicKey: data.args.pk,
+        fingerprint: data.args.pk,
         peerID: data.args.peer,
         blockstamp: data.args.timestamp.c[0],
-        valid: data.args.valid,
+        revoked: data.args.revoked,
         entity: data.args.entity
       })
       .then((value) => {
@@ -66,7 +67,17 @@ const certificates = {
         }
       })
       .then((data) => {
-        callback(null, data)
+        entities.getEntityById(data[0].entity, (err, entity) => {
+          console.log('HEREEEEEEEEE: ', entity)
+
+          if (err) {
+            callback(err, null)
+          }
+
+          const finalCertificate = Object.assign({}, data[0].dataValues, { valid: entity.valid })
+
+          callback(null, finalCertificate)
+        })
       })
       .catch((error) => {
         callback(error, null)

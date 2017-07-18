@@ -5,11 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER
     },
     ipAddress: DataTypes.STRING,
-    publicKey: DataTypes.STRING,
+    fingerprint: DataTypes.STRING,
     peerID: DataTypes.STRING,
     blockstamp: DataTypes.STRING,
     entity: DataTypes.STRING,
-    valid: DataTypes.BOOLEAN
+    revoked: DataTypes.BOOLEAN
   }, {
     underscored: true,
     classMethods: {

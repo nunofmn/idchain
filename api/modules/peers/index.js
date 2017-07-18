@@ -1,4 +1,9 @@
 const Joi = require('joi')
+const bunyan = require('bunyan')
+const log = bunyan.createLogger({
+  name: 'idchain',
+  serializers: { err: bunyan.stdSerializers.err }
+})
 
 const certificates = require('../../utils/certificates')
 
@@ -9,6 +14,7 @@ exports.register = function (server, options, next) {
     handler: function (request, reply) {
       certificates.getCertificatesByPeerId(request.params.id, (err, certificate) => {
         if (err) {
+          log.error(err)
           return reply(new Error('Error fetching certificate.'))
         }
 
