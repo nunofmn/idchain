@@ -161,11 +161,11 @@ const idchain = {
       })
   },
 
-  signCertificate (target, account, callback) {
+  signEntity (target, account, callback) {
     NodeCertificate.deployed()
       .then((instance) => {
         nodecert = instance
-        return nodecert.signCertificate(target, { from: account })
+        return nodecert.signEntity(target, { from: account, gas: 1000000 })
       })
       .then((value) => {
         callback(null, value)
@@ -174,11 +174,11 @@ const idchain = {
       })
   },
 
-  unsignCertificate (target, account, callback) {
+  unsignEntity (target, account, callback) {
     NodeCertificate.deployed()
       .then((instance) => {
         nodecert = instance
-        return nodecert.unsignCertificate(target, { from: account })
+        return nodecert.unsignEntity(target, { from: account, gas: 100000 })
       })
       .then((value) => {
         callback(null, value)
