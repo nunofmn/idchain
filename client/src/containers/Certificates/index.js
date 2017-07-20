@@ -19,7 +19,7 @@ class Certificates extends Component {
           account={accounts.account}
         />
         <CertificateForm
-          createCertificate={actions.createCertificate}
+          onSubmit={actions.createCertificate}
         />
       </div>
     )

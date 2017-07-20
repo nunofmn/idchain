@@ -36,7 +36,9 @@ class CertificatesList extends Component {
             <tr>
               <th>ID</th>
               <th>Peer ID</th>
-              <th>Validity</th>
+              <th>Revoked</th>
+              <th>IP Address</th>
+              <th>Fingerprint</th>
             </tr>
           </thead>
           <tbody>

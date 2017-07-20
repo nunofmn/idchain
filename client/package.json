@@ -5,13 +5,15 @@
   "proxy": "http://localhost:8080",
   "dependencies": {
     "history": "^4.6.1",
+    "node-forge": "^0.7.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-dropzone": "^3.13.3",
     "react-redux": "^5.0.5",
     "react-router-dom": "^4.1.1",
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^3.6.0",
-    "redux-form": "^6.7.0",
+    "redux-form": "^7.0.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
   },
