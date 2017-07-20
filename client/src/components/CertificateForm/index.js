@@ -1,27 +1,54 @@
+/* globals FileReader */
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, reduxForm, change } from 'redux-form'
 import Dropzone from 'react-dropzone'
 import forge from 'node-forge'
 
 const CertificateForm = props => {
   const {
     handleSubmit,
-    onSubmit,
     pristine,
     submitting
   } = props
 
+  const getCertFingerprint = (cert) => {
+    const certAsn1 = forge.pki.certificateToAsn1(cert)
+    const certDer = forge.asn1.toDer(certAsn1).getBytes()
+    const md = forge.md.sha256.create()
+
+    md.start()
+    md.update(certDer)
+
+    return md.digest().toHex().toUpperCase().match(/.{1,2}/g).join(':')
+  }
+
+  const getCertData = (certData) => {
+    const cert = forge.pki.certificateFromPem(certData)
+    const subjectAltName = cert.getExtension('subjectAltName')
+
+    return {
+      ipAddress: subjectAltName.altNames[1].value,
+      fingerprint: getCertFingerprint(cert),
+      peerID: subjectAltName.altNames[2].value
+    }
+  }
+
+  const updateCertFields = (certFields) => {
+    Object.keys(certFields).forEach(field => {
+      props.dispatch(change('CertificateNew', field, certFields[field]))
+    })
+  }
+
   const onDrop = files => {
-    const pki = forge.pki
-		const fileReader = new FileReader()
+    const fileReader = new FileReader()
 
-		fileReader.onloadend = function () {
-			const cert = pki.certificateFromPem(fileReader.result)
-			console.log(cert)
-		}
+    fileReader.onloadend = () => {
+      const certFields = getCertData(fileReader.result)
+      updateCertFields(certFields)
+    }
 
-		fileReader.readAsText(files[0])
-	}
+    fileReader.readAsText(files[0])
+  }
 
   return (
     <div>
@@ -38,7 +65,7 @@ const CertificateForm = props => {
               component='input'
               type='text'
               placeholder='127.0.0.1'
-            />
+			/>
           </div>
         </div>
         <div className='field'>
@@ -49,7 +76,7 @@ const CertificateForm = props => {
               component='input'
               type='text'
               placeholder=''
-            />
+			/>
           </div>
         </div>
         <div className='field'>
@@ -60,12 +87,12 @@ const CertificateForm = props => {
               component='input'
               type='text'
               placeholder='0xaaaaaaaaaaaaaaa'
-            />
+			/>
           </div>
         </div>
         <button className='ui button' type='submit' disabled={pristine || submitting}>
           {submitting ? <i /> : <i />} Submit
-        </button>
+		</button>
       </form>
     </div>
   )
