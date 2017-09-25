@@ -24,7 +24,7 @@ exports.register = function (server, options, next) {
     config: {
       validate: {
         params: {
-          id: Joi.string().min(42).max(42)
+          id: Joi.string().min(40).max(40)
         }
       }
     }
