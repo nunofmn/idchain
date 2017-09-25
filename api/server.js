@@ -11,7 +11,7 @@ const log = bunyan.createLogger({
 const manifest = {
   connections: [
     {
-      port: 8080,
+      port: process.env.API_PORT || 8080,
       labels: ['api'],
       routes: {
         cors: {
